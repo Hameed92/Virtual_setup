@@ -1,14 +1,16 @@
 import cv2
 import time
 import numpy as np
+import sys
 
 
 def calibrate(save_h = False, period =  100):
     video_feed = cv2.VideoCapture(-1)
-    video_feed.set(cv2.CAP_PROP_FRAME_WIDTH, 1280)
-    video_feed.set(cv2.CAP_PROP_FRAME_HEIGHT, 720)
+    #video_feed.set(cv2.CAP_PROP_FRAME_WIDTH, 1280)
+    #video_feed.set(cv2.CAP_PROP_FRAME_HEIGHT, 720)
 
     t1 = time.time()
+
     while True:
         _, img = video_feed.read()
         print(_, end='\r')
@@ -44,10 +46,10 @@ def calibrate(save_h = False, period =  100):
 
             cv2.imshow('img', warp_img)
 
-        if save_h:
-            np.save('h_from_board_function', h)
+            if save_h:
+               np.save('h_from_board_function_low', h)
+               print('saved h')
 
-        
         if cv2.waitKey(1) & 0xFF == ord('q'):
             break
 
@@ -57,5 +59,5 @@ def calibrate(save_h = False, period =  100):
     cv2.waitKey(0)
     cv2.destroyAllWindows()
     video_feed.release()
-
-calibrate()
+print(eval(sys.argv[1]))
+calibrate(eval(sys.argv[1]))

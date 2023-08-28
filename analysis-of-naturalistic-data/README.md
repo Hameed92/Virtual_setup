@@ -1,4 +1,0 @@
-# Group behavioral analysis for ETH Walking Pedestrians Dataset (EWAP)
-
-link to the GitHub repository:
-https://github.com/crowdbotp/OpenTraj/tree/master/datasets/ETH

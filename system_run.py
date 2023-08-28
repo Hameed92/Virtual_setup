@@ -5,7 +5,7 @@ from itertools import combinations
 import mediapipe as mp
 import math
 import sys
-from calibration import calibrate
+#from calibration import calibrate
 
 def single():
     print('single')
@@ -28,7 +28,7 @@ def single():
     fx, fy = (1.0, 1.0)
     px, py = (0.0, 0.0)
     iterations = [1, 2, 5, 6]
-    h = np.load('h_from_board.npy')
+    h = np.load('h_from_board_function.npy')
 
 
     axis_world = np.float32([[0, 0, 0], [1, 0, 0], [0, 1, 0], [0, 0, 1]])
@@ -47,7 +47,6 @@ def single():
             print('no detected objects', end='\r')
             continue
         for obj in results.detected_objects:
-            
             x.append(int(obj.landmarks_2d.landmark[0].x * img.shape[1]))
             y.append(int(obj.landmarks_2d.landmark[0].y * img.shape[0]))
 
@@ -92,8 +91,8 @@ def single():
 def dual_person():
     print('dual')
     vid = cv2.VideoCapture(-1)
-    vid.set(cv2.CAP_PROP_FRAME_WIDTH, 1280)
-    vid.set(cv2.CAP_PROP_FRAME_HEIGHT, 720)
+    #vid.set(cv2.CAP_PROP_FRAME_WIDTH, 1280)
+    #vid.set(cv2.CAP_PROP_FRAME_HEIGHT, 720)
     time.sleep(2)
 
 
@@ -124,7 +123,7 @@ def dual_person():
     fx, fy = (1.0, 1.0)
     px, py = (0.0, 0.0)
     iterations = [1, 2, 5, 6]
-    h = np.load('h_from_board.npy')
+    h = np.load('h_from_board_function_low.npy')
 
 
     axis_world = np.float32([[0, 0, 0], [1, 0, 0], [0, 1, 0], [0, 0, 1]])
@@ -175,7 +174,10 @@ def dual_person():
             #second_pair = fetch_value(obj_index[1])
             for pair in pairs:
                 x, y = midpoint(center, pair)
+                x, y = point_transform((x,y), h)
                 z0, z1 = midpoint(z_axis, pair)
+                z0, z1 = point_transform((z0, z1), h)
+                ann_img = cv2.warpPerspective(ann_img, h, (img.shape[1],img.shape[0]))
                 cv2.circle(ann_img, (int(x), int(y)), radius=60, color=(0, 0, 255), thickness=5)
                 cv2.arrowedLine(ann_img, (int(x), int(y)), (int(z0), int(z1)), color=(0, 128, 0), thickness=3, tipLength=3)
             cv2.imshow('img', ann_img)
@@ -302,8 +304,8 @@ def multi():
     cv2.destroyAllWindows()
     vid.release()
 
-if sys.argv[2] == '1':
-    calibrate(save_h=True)
+#if sys.argv[2] == '1':
+#    calibrate(save_h=True)
 
 if sys.argv[1] == '1':
     single()
