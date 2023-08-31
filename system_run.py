@@ -9,7 +9,7 @@ import sys
 
 def single():
     print('single')
-    vid = cv2.VideoCapture(-1)
+    vid = cv2.VideoCapture(source)
     vid.set(cv2.CAP_PROP_FRAME_WIDTH, 1280)
     vid.set(cv2.CAP_PROP_FRAME_HEIGHT, 720)
     time.sleep(2)
@@ -35,6 +35,7 @@ def single():
 
     t_end = time.time() + 60 * 15
     while time.time() < t_end:
+        start_time = time.time()
         _, img = vid.read()
         objectron = mp_objectron.Objectron(mp_objectron.Objectron(static_image_mode=True, max_num_objects=5, min_detection_confidence=0.5, model_name='Shoe'))
         results = objectron.process(cv2.cvtColor(img, cv2.COLOR_BGR2RGB))
@@ -72,14 +73,18 @@ def single():
             warp_img = cv2.circle(warp_img, (int(x), int(y)), radius=100, color=(0, 0, 255), thickness=5)
             warp_img = cv2.arrowedLine(warp_img, (int(x), int(y)), (int(z0), int(z1)), color=(0, 128, 0), thickness=3, tipLength=0.5)
         except:
-            print('not enough points', end='\r')
+            print('not enough points')
 
         try:
             cv2.imshow('ann_img', warp_img)
+            delta_time = time.time() - start_time
+            print(f'success, FPS = {int(1/delta_time)}',  end='\r')
             if cv2.waitKey(1) & 0xFF == ord('q'):
                 break
         except:
             print('wait', end='\r')
+        
+        #print('fps = ', 1/int(end_time - start_time))
     cv2.waitKey(0)
     cv2.destroyAllWindows()
     vid.release()
@@ -90,7 +95,7 @@ def single():
 
 def dual_person():
     print('dual')
-    vid = cv2.VideoCapture(-1)
+    vid = cv2.VideoCapture(source)
     #vid.set(cv2.CAP_PROP_FRAME_WIDTH, 1280)
     #vid.set(cv2.CAP_PROP_FRAME_HEIGHT, 720)
     time.sleep(2)
@@ -130,6 +135,7 @@ def dual_person():
 
     t_end = time.time() + 60 * 15
     while time.time() < t_end:
+        start_time = time.time()
         _, img = vid.read()
         objectron = mp_objectron.Objectron(mp_objectron.Objectron(static_image_mode=True, max_num_objects=5, min_detection_confidence=0.5, model_name='Shoe'))
         results = objectron.process(cv2.cvtColor(img, cv2.COLOR_BGR2RGB))
@@ -181,13 +187,14 @@ def dual_person():
                 cv2.circle(ann_img, (int(x), int(y)), radius=60, color=(0, 0, 255), thickness=5)
                 cv2.arrowedLine(ann_img, (int(x), int(y)), (int(z0), int(z1)), color=(0, 128, 0), thickness=3, tipLength=3)
             cv2.imshow('img', ann_img)
+            delta_time = time.time() - start_time
+            print(f'success, FPS = {int(1/delta_time)}',  end='\r')
             if cv2.waitKey(1) & 0xFF == ord('q'):
                 break
-        
-        
+
         except:
             print('not enough points', end='\r')
-
+        
     cv2.waitKey(0)
     cv2.destroyAllWindows()
     vid.release()
@@ -196,7 +203,7 @@ def dual_person():
 
 def multi():
     print('multi')
-    vid = cv2.VideoCapture(-1)
+    vid = cv2.VideoCapture(source)
     vid.set(cv2.CAP_PROP_FRAME_WIDTH, 1280)
     vid.set(cv2.CAP_PROP_FRAME_HEIGHT, 720)
     time.sleep(2)
@@ -245,6 +252,7 @@ def multi():
 
     t_end = time.time() + 60 * 15
     while time.time() < t_end:
+        start_time = time.time()
         _, img = vid.read()
         objectron = mp_objectron.Objectron(mp_objectron.Objectron(static_image_mode=True, max_num_objects=5, min_detection_confidence=0.5, model_name='Shoe'))
         results = objectron.process(cv2.cvtColor(img, cv2.COLOR_BGR2RGB))
@@ -299,13 +307,20 @@ def multi():
         
         except:
             print('not enough points', end='\r')
-
+        
+        end_time = time.time()
+        print('fps = ', 1/int(end_time - start_time))
     cv2.waitKey(0)
     cv2.destroyAllWindows()
     vid.release()
 
 #if sys.argv[2] == '1':
 #    calibrate(save_h=True)
+
+try:
+    source = sys.argv[2]
+except:
+    source = -1
 
 if sys.argv[1] == '1':
     single()
